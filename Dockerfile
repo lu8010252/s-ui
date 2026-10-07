@@ -23,18 +23,10 @@ RUN apk upgrade --no-cache --scripts=no apk-tools && \
     libc-dev \
     make \
     git \
-    wget \
-    unzip \
     bash \
     curl
 
 ENV CC=gcc
-
-RUN CRONET_ARCH="$TARGETARCH" && \
-    CRONET_URL="https://github.com/SagerNet/cronet-go/releases/latest/download/libcronet-linux-${CRONET_ARCH}.so"; \
-    echo "Downloading $CRONET_URL" && \
-    wget -q -O ./libcronet.so "$CRONET_URL" && \
-    chmod 755 ./libcronet.so
 
 COPY . .
 COPY --from=front-builder /app/dist/ /app/web/html/
@@ -47,13 +39,13 @@ RUN if [ "$TARGETARCH" = "arm" ]; then export GOARM=7; [ "$TARGETVARIANT" = "v6"
 
 FROM alpine:3.24.1@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b
 LABEL org.opencontainers.image.authors="alireza7@gmail.com"
-ENV TZ=Asia/Tehran
+ENV TZ=Asia/Shanghai
 WORKDIR /app
 RUN set -ex && apk upgrade --no-cache --scripts=no apk-tools && \
-    apk add --no-cache --upgrade bash ca-certificates nftables su-exec && \
+    apk add --no-cache --upgrade bash ca-certificates su-exec && \
     addgroup -S -g 10001 sui && \
     adduser -S -u 10001 -G sui -h /app -s /sbin/nologin sui
-COPY --from=backend-builder /app/sui /app/libcronet.so /app/
+COPY --from=backend-builder /app/sui /app/
 COPY entrypoint.sh /app/
 
 # Asks the binary, which reads the port the operator actually configured. A

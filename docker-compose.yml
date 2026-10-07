@@ -1,12 +1,14 @@
 ---
 services:
   s-ui:
-    image: alireza7/s-ui
+    image: ghcr.io/lu8010252/s-ui
     container_name: s-ui
     hostname: "s-ui"
     volumes:
       - "./db:/app/db"
       - "./cert:/app/cert"
+    environment:
+      TZ: Asia/Shanghai
     tty: true
     restart: unless-stopped
     ports:

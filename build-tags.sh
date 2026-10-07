@@ -19,16 +19,18 @@
 # -l:libcronet.a". The linkname tags require -checklinkname=0, which is why
 # ldflags_for exists -- the pair used to be kept in step by hand in three files.
 
-BASE_TAGS="with_quic,with_grpc,with_utls,with_acme,with_gvisor,with_tailscale,with_cloudflared,with_openconnect,with_openvpn"
+# Trimmed build: only hy2/socks5 needs QUIC. Dropped: grpc, utls, acme (certs are
+# copied in by script), gvisor, tailscale, cloudflared, openconnect, openvpn,
+# and naive (+ musl/purego, which only existed for libcronet).
+BASE_TAGS="with_quic"
 LINKNAME_TAGS="badlinkname,tfogo_checklinkname0"
-NAIVE_TAGS="with_naive_outbound"
 
 tags_for() {
     case "$1" in
         test)        echo "${BASE_TAGS},${LINKNAME_TAGS}" ;;
-        dev|release) echo "${BASE_TAGS},${LINKNAME_TAGS},${NAIVE_TAGS},with_musl" ;;
-        windows)     echo "${BASE_TAGS},${LINKNAME_TAGS},${NAIVE_TAGS},with_purego" ;;
-        docker)      echo "${BASE_TAGS},${NAIVE_TAGS},with_purego" ;;
+        dev|release) echo "${BASE_TAGS},${LINKNAME_TAGS}" ;;
+        windows)     echo "${BASE_TAGS},${LINKNAME_TAGS}" ;;
+        docker)      echo "${BASE_TAGS}" ;;
         *)
             echo "build-tags.sh: unknown build profile '$1'" >&2
             return 1
